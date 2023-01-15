@@ -80,7 +80,6 @@ var BuildFullTextSearchIndex = (ElasticClient client) =>
                         )
                     )
                 );
-
 };
 
 
@@ -156,8 +155,8 @@ while (indexedDocuments < maxIndexedDocuments)
 Console.ForegroundColor = ConsoleColor.Yellow;
 Console.WriteLine($"Load test ended with {indexedDocuments} documents indexed");
 Console.WriteLine($"Total time: {(elapsedMilliseconds / 1000d) / 60d} minutes");
-Console.WriteLine($"Average indexing time: {((elapsedMilliseconds / indexedDocuments) / 1000d) / 60d} minutes");
-Console.WriteLine($"Most expensive document indexing time: {(mostExpensiveIndex / 1000d) / 60d} minutes");
+Console.WriteLine($"Average indexing time: {elapsedMilliseconds / (decimal)indexedDocuments} milliseconds");
+Console.WriteLine($"Most expensive document indexing time: {(mostExpensiveIndex / 1000d)} seconds");
 
 Console.ForegroundColor = ConsoleColor.Green;
 Console.WriteLine($"Starting exact search by Id test");
@@ -206,8 +205,8 @@ for (int i = 0; i < searchAttempts; i++)
 
 Console.ForegroundColor = ConsoleColor.Yellow;
 Console.WriteLine($"Exact Id search test ended with {searchAttempts} search attempts");
-Console.WriteLine($"Average search time: {((totalExactSearchMilliseconds / searchAttempts) / 1000d) / 60d} minutes");
-Console.WriteLine($"Most expensive exact search by Id time: {(mostExpensiveExactSearchById / 1000d) / 60d} minutes");
+Console.WriteLine($"Average search time: {totalExactSearchMilliseconds / (decimal)searchAttempts} milliseconds");
+Console.WriteLine($"Most expensive exact search by Id time: {(mostExpensiveExactSearchById / 1000d)} seconds");
 
 
 Console.ForegroundColor = ConsoleColor.Green;
@@ -273,8 +272,8 @@ for (int i = 0; i < searchByNameAttempts; i++)
 
 Console.ForegroundColor = ConsoleColor.Yellow;
 Console.WriteLine($"Exact name search test ended with {searchByNameAttempts} search attempts");
-Console.WriteLine($"Average search time: {((totalExactByNameSearchMilliseconds / searchByNameAttempts) / 1000d) / 60d} minutes");
-Console.WriteLine($"Most expensive exact search by name time: {(mostExpensiveExactByNameSearchById / 1000d) / 60d} minutes");
+Console.WriteLine($"Average search time: {totalExactByNameSearchMilliseconds / (decimal)searchByNameAttempts} milliseconds");
+Console.WriteLine($"Most expensive exact search by name time: {(mostExpensiveExactByNameSearchById / 1000d)} seconds");
 
 
 Console.ForegroundColor = ConsoleColor.Green;
@@ -337,8 +336,8 @@ for (int i = 0; i < searchRangeAttempts; i++)
 
 Console.ForegroundColor = ConsoleColor.Yellow;
 Console.WriteLine($"Range search test ended with {searchRangeAttempts} search attempts");
-Console.WriteLine($"Average search time: {((totalRangeSearchMilliseconds / searchRangeAttempts) / 1000d) / 60d} minutes");
-Console.WriteLine($"Most expensive range search time: {(mostExpensiveRangeSearch / 1000d) / 60d} minutes");
+Console.WriteLine($"Average search time: {totalRangeSearchMilliseconds / (decimal)searchRangeAttempts} milliseconds");
+Console.WriteLine($"Most expensive range search time: {(mostExpensiveRangeSearch / 1000d)} seconds");
 
 
 Console.ForegroundColor = ConsoleColor.Green;
@@ -347,7 +346,7 @@ long totalPhoneticSearchMilliseconds = 0;
 long mostExpensivePhoneticSearch = 0;
 var searchPhoneticAttempts = 30;
 indexSearched = new List<int>();
-for (int i = 0; i < searchPhoneticAttempts; i++)
+for (int i = 0; i < 30; i++)
 {
     Console.ForegroundColor = ConsoleColor.Gray;
     Console.WriteLine($"Search attempt {i + 1}");
@@ -405,8 +404,8 @@ for (int i = 0; i < searchPhoneticAttempts; i++)
 
 Console.ForegroundColor = ConsoleColor.Yellow;
 Console.WriteLine($"Phonetic search test ended with {searchPhoneticAttempts} search attempts");
-Console.WriteLine($"Average search time: {((totalPhoneticSearchMilliseconds / searchPhoneticAttempts) / 1000d) / 60d} minutes");
-Console.WriteLine($"Most expensive phonetic search time: {(mostExpensivePhoneticSearch / 1000d) / 60d} minutes");
+Console.WriteLine($"Average search time: {totalPhoneticSearchMilliseconds / (decimal)searchPhoneticAttempts} milliseconds");
+Console.WriteLine($"Most expensive phonetic search time: {(mostExpensivePhoneticSearch / 1000d)} seconds");
 
 
 Console.ForegroundColor = ConsoleColor.Green;
@@ -448,7 +447,7 @@ foreach (var testName in testNames)
                     );
     stopWatch.Stop();
     Console.WriteLine($"Search with: {testName}");
-    Console.WriteLine($"Search time: {(stopWatch.ElapsedMilliseconds / 1000d) / 60d} minutes");
+    Console.WriteLine($"Search time: {(stopWatch.ElapsedMilliseconds / 1000d)} seconds");
     Console.WriteLine($"Search result is valid: {phoneticTest.IsValid}");
     Console.WriteLine($"Documents found: {phoneticTest.Total}");
     Console.WriteLine($"Documents: {string.Join("|", phoneticTest.Documents.Select(d => $"Id: {d.Id}, Name: {d.DocumentData.First(data => data.Key == "name").TextValue}"))}");
@@ -457,4 +456,6 @@ foreach (var testName in testNames)
 
 Console.ForegroundColor = ConsoleColor.Green;
 Console.WriteLine($"---- All tests completed ----");
+client.Indices.Delete(indexName);
+Console.WriteLine("Index removed!");
 Console.ForegroundColor = defaultConsoleColor;
